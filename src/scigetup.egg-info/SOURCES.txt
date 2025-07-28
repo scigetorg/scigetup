@@ -1,8 +1,0 @@
-README.md
-pyproject.toml
-src/scigetup/__init__.py
-src/scigetup/__main__.py
-src/scigetup.egg-info/PKG-INFO
-src/scigetup.egg-info/SOURCES.txt
-src/scigetup.egg-info/dependency_links.txt
-src/scigetup.egg-info/top_level.txt
