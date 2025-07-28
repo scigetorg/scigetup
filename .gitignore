@@ -3,3 +3,17 @@
 
 # Virtual Environment
 .venv/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+build/
+dist/
+*.egg-info/
+.installed.cfg
+*.egg
+.env
+.env.*
+*.log
