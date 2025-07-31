@@ -1,0 +1,11 @@
+{
+    "Sample Category": {
+        "software": [
+            {
+                "name": "TestApp",
+                "executable": "testapp-cli",
+                "gui": false
+            }
+        ]
+    }
+}
