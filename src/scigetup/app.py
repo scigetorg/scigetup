@@ -7,9 +7,8 @@ import argparse
 from pathlib import Path
 import sys
 
-EESSI_INIT_SCRIPT = "/cvmfs/eessi.io/versions/2023.06/init/bash"
 DESKTOP_DIR = Path.home() / "Desktop"
-BASE_FOLDER_NAME = "EESSI Applications"
+BASE_FOLDER_NAME = "Software Applications"
 
 def create_desktop_file(category_path: Path, app_info: dict):
     """
@@ -28,10 +27,10 @@ def create_desktop_file(category_path: Path, app_info: dict):
     # For command-line tools, it opens an interactive bash shell.
     # For GUI tools, it launches them directly and exits the terminal.
     if is_gui:
-        command = f"source {EESSI_INIT_SCRIPT}; module load {app_name}; {executable}"
+        command = f"module load {app_name}; {executable}"
     else:
         command = (
-            f"source {EESSI_INIT_SCRIPT}; module load {app_name}; "
+            f"module load {app_name}; "
             f"echo '*** Environment for {app_name} is now loaded. ***'; "
             f"echo '*** To run the tool, type: {executable} ***'; "
             "echo '*** Type `exit` to close this terminal. ***'; "
@@ -68,24 +67,19 @@ Categories=Science;Education;
 def main():
     """Main function to parse arguments and drive the launcher creation."""
     parser = argparse.ArgumentParser(
-        description="Create desktop launchers for EESSI software from a JSON config file.",
+        description="Create desktop launchers for software from a JSON config file.",
         epilog="For more information on the scigetup project, visit https://github.com/scigetorg/scigetup"
     )
     parser.add_argument(
         "json_file",
         type=Path,
-        help="Path to the JSON file containing the EESSI software configuration."
+        help="Path to the JSON file containing the software configuration."
     )
     args = parser.parse_args()
 
-    print("--- EESSI Desktop Launcher Creator ---")
+    print("--- Desktop Launcher Creator ---")
 
     # --- Pre-run Checks ---
-    if not Path(EESSI_INIT_SCRIPT).exists():
-        print(f"[ERROR] EESSI init script not found at '{EESSI_INIT_SCRIPT}'.", file=sys.stderr)
-        print("Please ensure the EESSI CVMFS repository is mounted correctly.", file=sys.stderr)
-        sys.exit(1)
-
     if not args.json_file.is_file():
         print(f"[ERROR] The specified JSON file does not exist: {args.json_file}", file=sys.stderr)
         sys.exit(1)
