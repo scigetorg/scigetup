@@ -31,11 +31,9 @@ def create_desktop_file(category_path: Path, app_info: dict):
     else:
         command = (
             f"module load {app_name}; "
-            f"echo '*** Environment for {app_name} is now loaded. ***'; "
-            f"echo '*** To run the tool, type: {executable} ***'; "
-            "echo '*** Type `exit` to close this terminal. ***'; "
-            "exec bash"
-        )
+            f"echo '=== Environment for {app_name} is now loaded. ==='; "
+            f"echo '=== To run the tool, type: {executable} ==='"
+       )
 
     # Define the content of the .desktop file using the freedesktop.org standard
     desktop_file_content = f"""[Desktop Entry]
