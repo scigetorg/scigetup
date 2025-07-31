@@ -42,7 +42,7 @@ Type=Application
 Name={app_name}
 Comment={notes}
 Icon=utilities-terminal
-Exec=x-terminal-emulator -- bash -c "{command}"
+Exec=gnome-terminal -- bash -c "{command}"
 Terminal=false
 Categories=Science;Education;
 """
@@ -50,14 +50,27 @@ Categories=Science;Education;
     file_path = category_path / f"{app_name}.desktop"
     
     try:
-        with open(file_path, "w") as f:
-            f.write(desktop_file_content)
-        
-        # Make the .desktop file executable for the user and group
-        # This is required for the "Allow Launching" option to appear
-        file_path.chmod(stat.S_IRWXU | stat.S_IRGRP | stat.S_IXGRP | stat.S_IROTH | stat.S_IXOTH)
-        
-        print(f"  - Created launcher for {app_name}")
+        # Check if the file exists and what its content is
+        existing_content = ""
+        if file_path.exists():
+            with open(file_path, "r") as f:
+                existing_content = f.read()
+
+        # Only write the file if the content has changed
+        if existing_content != desktop_file_content:
+            with open(file_path, "w") as f:
+                f.write(desktop_file_content)
+            
+            # Make the .desktop file executable
+            file_path.chmod(stat.S_IRWXU | stat.S_IRGRP | stat.S_IXGRP | stat.S_IROTH | stat.S_IXOTH)
+            
+            if existing_content:
+                print(f"  - Updated launcher for {app_name}")
+            else:
+                print(f"  - Created launcher for {app_name}")
+        else:
+            print(f"  - No changes for {app_name}, launcher is up to date.")
+            
     except IOError as e:
         print(f"  [ERROR] Failed to write launcher for {app_name}: {e}", file=sys.stderr)
 
