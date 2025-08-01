@@ -34,7 +34,7 @@ Name={app_name}
 GenericName={app_name}
 Comment={notes}
 Icon=utilities-terminal
-Exec=/bin/bash -ic 'module load {app_name}; export PROMPT_COMMAND="echo \\"=== Environment for {app_name} is now loaded. You can run: {executable} ===\\"; unset PROMPT_COMMAND"; exec bash'
+Exec=/bin/bash -ic 'module load {app_name}; export PROMPT_COMMAND="echo -e \\"=== {app_name} module is loaded === \\\\n=== You can run: {executable} ===\\"; unset PROMPT_COMMAND"; exec bash'
 Type=Application
 Categories={app_name}
 Terminal=true
