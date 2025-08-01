@@ -108,7 +108,7 @@ def main():
 
     for category, details in software_data.items():
         print(f"Processing category: {category}")
-        category_path = base_path / category.replace(" ", "_").replace("&", "and")
+        category_path = base_path / category.replace(" ", "-").replace("&", "and")
         category_path.mkdir(exist_ok=True)
         
         if not details.get("software"):
