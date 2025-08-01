@@ -28,17 +28,13 @@ def create_desktop_file(category_path: Path, app_info: dict):
     if not executable:
         executable = "bash"
 
-    prompt_command = (
-            f"export PROMPT_COMMAND='echo -e \"\\n=== Module for \\'{app_name}\\' is now loaded."
-            f"\\n=== You can run: \\'{executable}\\' ===\\n\"; unset PROMPT_COMMAND'"
-        )
     # Define the content of the .desktop file using the freedesktop.org standard
     desktop_file_content = f"""[Desktop Entry]
 Name={app_name}
 GenericName={app_name}
 Comment={notes}
 Icon=utilities-terminal
-Exec=/bin/bash -ic 'module load {app_name}; {prompt_command}; exec bash'
+Exec=/bin/bash -ic 'module load {app_name}; export PROMPT_COMMAND="echo \\"=== Environment for {app_name} is now loaded. You can run: {executable} ===\\"; unset PROMPT_COMMAND"; exec bash'
 Type=Application
 Categories={app_name}
 Terminal=true
