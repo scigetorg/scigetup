@@ -31,14 +31,14 @@ def create_desktop_file(category_path: Path, app_info: dict):
 
     # Define the content of the .desktop file using the freedesktop.org standard
     desktop_file_content = f"""[Desktop Entry]
-Version=1.0
-Type=Application
 Name={app_name}
+GenericName={app_name}
 Comment={notes}
 Icon=utilities-terminal
 Exec=/bin/bash -ic 'module load {app_name}; {executable}'
+Type=Application
+Categories={app_name}
 Terminal=false
-Categories=Science;Education;
 """
 
     file_path = category_path / f"{app_name}.desktop"
