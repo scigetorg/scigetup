@@ -38,7 +38,7 @@ Icon=utilities-terminal
 Exec=/bin/bash -ic 'module load {app_name}; {executable}'
 Type=Application
 Categories={app_name}
-Terminal=false
+Terminal=true
 """
 
     file_path = category_path / f"{app_name}.desktop"
