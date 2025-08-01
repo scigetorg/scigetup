@@ -1,7 +1,7 @@
 from unittest.mock import patch, mock_open
 from pathlib import Path
-import io
 import pytest
+import json
 
 from scigetup.app import main, create_desktop_file
 
@@ -24,34 +24,44 @@ def test_create_desktop_file_gui():
     written_content = "".join(call.args[0] for call in handle.write.call_args_list)
     assert "[Desktop Entry]" in written_content
     assert "Name=TestApp" in written_content
-    assert "Exec=gnome-terminal -- bash -c \"source /cvmfs/eessi.io/versions/2023.06/init/bash; module load TestApp; testapp-gui\"" in written_content
+    # Corrected assertion for the Exec command
+    assert 'Exec=x-terminal-emulator -- bash -c "module load TestApp; testapp-gui"' in written_content
     assert "Terminal=false" in written_content
     
     # Check that chmod was called
     mock_chmod.assert_called_once()
 
 # Test for the main function
-@patch('sys.argv', ['scigetup', 'tests/test_software.json'])
+@patch('sys.argv', ['scigetup', 'fake/path/software.json'])
+@patch('scigetup.app.Path.is_file', return_value=True) # Mock is_file to return True
 @patch('scigetup.app.Path.home')
-@patch('scigetup.app.Path.exists')
 @patch('scigetup.app.Path.mkdir')
 @patch('scigetup.app.create_desktop_file')
-def test_main_success(mock_create_desktop, mock_mkdir, mock_exists, mock_home):
+def test_main_success(mock_create_desktop, mock_mkdir, mock_home, mock_is_file):
     # Setup mocks
     mock_home.return_value = Path("/fake/home")
-    mock_exists.return_value = True # EESSI init script exists
-
-    # Run main
-    main()
+    
+    # Mock file content
+    mock_data = json.dumps({
+        "Sample Category": {
+            "software": [{"name": "TestApp", "executable": "testapp-cli"}]
+        }
+    })
+    
+    # Use mock_open to simulate opening the file
+    with patch("builtins.open", mock_open(read_data=mock_data)) as mock_file:
+        # Run main
+        main()
 
     # Assertions
+    # Check that the file was "opened"
+    mock_file.assert_called_once_with(Path('fake/path/software.json'), "r")
+    
     # Check that the base directory is created
     mock_mkdir.assert_any_call(parents=True, exist_ok=True)
     
     # Check that create_desktop_file was called
     mock_create_desktop.assert_called_once()
     
-    # You can add more specific assertions here, e.g., checking the arguments
-    # passed to mock_create_desktop
     args, kwargs = mock_create_desktop.call_args
     assert args[1]['name'] == 'TestApp'
