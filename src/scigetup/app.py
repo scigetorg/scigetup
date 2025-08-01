@@ -26,14 +26,8 @@ def create_desktop_file(category_path: Path, app_info: dict):
     # Define the command to be executed by the launcher.
     # For command-line tools, it opens an interactive bash shell.
     # For GUI tools, it launches them directly and exits the terminal.
-    if is_gui:
-        command = f"module load {app_name}; {executable}"
-    else:
-        command = (
-            f"module load {app_name}; "
-            f"echo '=== Environment for {app_name} is now loaded. ==='; "
-            f"echo '=== To run the tool, type: {executable} ==='"
-       )
+    if not executable:
+        executable = "bash"
 
     # Define the content of the .desktop file using the freedesktop.org standard
     desktop_file_content = f"""[Desktop Entry]
@@ -42,7 +36,7 @@ Type=Application
 Name={app_name}
 Comment={notes}
 Icon=utilities-terminal
-Exec=x-terminal-emulator -- bash -c "{command}"
+Exec=/bin/bash -ic 'module load {app_name}; {executable}'
 Terminal=false
 Categories=Science;Education;
 """
