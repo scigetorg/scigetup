@@ -42,7 +42,7 @@ Type=Application
 Name={app_name}
 Comment={notes}
 Icon=utilities-terminal
-Exec=gnome-terminal -- bash -c "{command}"
+Exec=x-terminal-emulator -- bash -c "{command}"
 Terminal=false
 Categories=Science;Education;
 """
