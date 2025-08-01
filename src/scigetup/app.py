@@ -20,7 +20,6 @@ def create_desktop_file(category_path: Path, app_info: dict):
     """
     app_name = app_info["name"]
     executable = app_info["executable"]
-    is_gui = app_info.get("gui", False)
     notes = app_info.get("notes", f"Launch the {app_name} application/environment.")
     
     # Define the command to be executed by the launcher.
@@ -35,7 +34,7 @@ Name={app_name}
 GenericName={app_name}
 Comment={notes}
 Icon=utilities-terminal
-Exec=/bin/bash -ic 'module load {app_name}; {executable}'
+Exec=/bin/bash -ic 'module load {app_name}; export PROMPT_COMMAND="echo -e \\"=== {app_name} module is loaded === \\\\n=== You can run: {executable} ===\\"; unset PROMPT_COMMAND"; exec bash'
 Type=Application
 Categories={app_name}
 Terminal=true
