@@ -79,21 +79,33 @@ def main():
     # --- Sub-parser for the 'install' command ---
     parser_install = subparsers.add_parser("install", help="Install or update desktop launchers from a JSON file.")
     parser_install.add_argument(
-        "json_file",
-        nargs="?",
+        "--json",
+        dest="json_file", # The value will be stored in args.json_file
         type=Path,
         default="software.json",
-        help="Path to the JSON file. Defaults to 'software.json' in the current directory."
+        help="Path to the JSON file. Defaults to 'software.json'."
+    )
+    parser_install.add_argument(
+        "--path",
+        type=Path,
+        default=Path.cwd(),
+        help="The directory to install the launchers into. Defaults to the current directory."
     )
 
     # --- Sub-parser for the 'update' command (alias for install) ---
     parser_update = subparsers.add_parser("update", help="Alias for the 'install' command.")
     parser_update.add_argument(
-        "json_file",
-        nargs="?",
+        "--json",
+        dest="json_file",
         type=Path,
         default="software.json",
-        help="Path to the JSON file. Defaults to 'software.json' in the current directory."
+        help="Path to the JSON file. Defaults to 'software.json'."
+    )
+    parser_update.add_argument(
+        "--path",
+        type=Path,
+        default=Path.cwd(),
+        help="The directory to install the launchers into. Defaults to the current directory."
     )
 
     args = parser.parse_args()
@@ -107,6 +119,9 @@ def main():
             print(f"[ERROR] The specified JSON file does not exist: {args.json_file}", file=sys.stderr)
             sys.exit(1)
         
+        base_path = args.path / BASE_FOLDER_NAME
+        print(f"Launchers will be created in: {base_path}\\n")
+        
         try:
             with open(args.json_file, "r") as f:
                 software_data = json.load(f)
@@ -116,10 +131,6 @@ def main():
         except IOError as e:
             print(f"[ERROR] Could not read the JSON file: {e}", file=sys.stderr)
             sys.exit(1)
-
-        # --- Main Logic ---
-        base_path = DESKTOP_DIR / BASE_FOLDER_NAME
-        print(f"Launchers will be created in: {base_path}\\n")
 
         # Create the base directory on the Desktop
         base_path.mkdir(parents=True, exist_ok=True)
