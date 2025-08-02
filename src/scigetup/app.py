@@ -8,7 +8,7 @@ from pathlib import Path
 import sys
 
 DESKTOP_DIR = Path.home() / "Desktop"
-BASE_FOLDER_NAME = "Software Applications"
+BASE_FOLDER_NAME = "Software-Applications"
 
 def create_desktop_file(category_path: Path, app_info: dict):
     """
@@ -71,57 +71,72 @@ Terminal=true
 def main():
     """Main function to parse arguments and drive the launcher creation."""
     parser = argparse.ArgumentParser(
-        description="Create desktop launchers for software from a JSON config file.",
+        description="Create or update desktop launchers for software from a JSON config file.",
         epilog="For more information on the scigetup project, visit https://github.com/scigetorg/scigetup"
     )
-    parser.add_argument(
+    subparsers = parser.add_subparsers(dest="command", required=True, help="Available commands")
+
+    # --- Sub-parser for the 'install' command ---
+    parser_install = subparsers.add_parser("install", help="Install or update desktop launchers from a JSON file.")
+    parser_install.add_argument(
         "json_file",
+        nargs="?",
         type=Path,
-        help="Path to the JSON file containing the software configuration."
+        default="software.json",
+        help="Path to the JSON file. Defaults to 'software.json' in the current directory."
     )
+
+    # --- Sub-parser for the 'update' command (alias for install) ---
+    parser_update = subparsers.add_parser("update", help="Alias for the 'install' command.")
+    parser_update.add_argument(
+        "json_file",
+        nargs="?",
+        type=Path,
+        default="software.json",
+        help="Path to the JSON file. Defaults to 'software.json' in the current directory."
+    )
+
     args = parser.parse_args()
 
-    print("--- Desktop Launcher Creator ---")
-
-    # --- Pre-run Checks ---
-    if not args.json_file.is_file():
-        print(f"[ERROR] The specified JSON file does not exist: {args.json_file}", file=sys.stderr)
-        sys.exit(1)
-
     # --- Main Logic ---
-    base_path = DESKTOP_DIR / BASE_FOLDER_NAME
-    print(f"Launchers will be created in: {base_path}\n")
+    # Runs if either 'install' or 'update' is used.
+    if args.command in ["install", "update"]:
+        print("--- Desktop Launcher Installer ---")
 
-    try:
-        with open(args.json_file, "r") as f:
-            software_data = json.load(f)
-    except json.JSONDecodeError as e:
-        print(f"[ERROR] Could not parse the JSON file. Invalid JSON: {e}", file=sys.stderr)
-        sys.exit(1)
-    except IOError as e:
-        print(f"[ERROR] Could not read the JSON file: {e}", file=sys.stderr)
-        sys.exit(1)
-
-    # Create the base directory on the Desktop
-    base_path.mkdir(parents=True, exist_ok=True)
-
-    for category, details in software_data.items():
-        print(f"Processing category: {category}")
-        category_path = base_path / category.replace(" ", "-").replace("&", "and")
-        category_path.mkdir(exist_ok=True)
+        if not args.json_file.is_file():
+            print(f"[ERROR] The specified JSON file does not exist: {args.json_file}", file=sys.stderr)
+            sys.exit(1)
         
-        if not details.get("software"):
-            print(f"  - No software listed in this category, skipping.")
-            continue
+        try:
+            with open(args.json_file, "r") as f:
+                software_data = json.load(f)
+        except json.JSONDecodeError as e:
+            print(f"[ERROR] Could not parse the JSON file. Invalid JSON: {e}", file=sys.stderr)
+            sys.exit(1)
+        except IOError as e:
+            print(f"[ERROR] Could not read the JSON file: {e}", file=sys.stderr)
+            sys.exit(1)
 
-        for app in details["software"]:
-            create_desktop_file(category_path, app)
-        print("-" * 30)
+        # --- Main Logic ---
+        base_path = DESKTOP_DIR / BASE_FOLDER_NAME
+        print(f"Launchers will be created in: {base_path}\\n")
 
-    print("\nScript finished successfully.")
-    print(f"Check your Desktop for the '{BASE_FOLDER_NAME}' folder.")
-    print("On first use, you may need to right-click each launcher and select 'Allow Launching'.")
+        # Create the base directory on the Desktop
+        base_path.mkdir(parents=True, exist_ok=True)
 
+        for category, details in software_data.items():
+            print(f"Processing category: {category}")
+            category_path = base_path / category.replace(" ", "-").replace("&", "and")
+            category_path.mkdir(exist_ok=True)
+            
+            if not details.get("software"):
+                print(f"  - No software listed in this category, skipping.")
+                continue
 
-if __name__ == "__main__":
-    main()
+            for app in details["software"]:
+                create_desktop_file(category_path, app)
+            print("-" * 30)
+
+        print("\\nScript finished successfully.")
+        print(f"Check your Desktop for the '{BASE_FOLDER_NAME}' folder.")
+        print("On first use, you may need to right-click each launcher and select 'Allow Launching'.")
